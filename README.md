@@ -9,7 +9,6 @@ As the dataset evolves, you can apply a one-time schema + data update, and uploa
 ## Setup
 
 Use `uv`, and export both `OPENAI_API_KEY` and `HF_TOKEN`.
-The scripts read `.env`, so putting your keys there is fine too.
 
 ```bash
 uv sync
@@ -18,7 +17,9 @@ export HF_TOKEN=hf_...
 hf auth login --token "$HF_TOKEN"
 ```
 
-## Stage 1: Create the Initial Local Table
+The scripts look for a local file named `.env`, so to run any of them, you'll need to copy the `.env.example` to a new file named `.env` and update the respective env variables there.
+
+## Step 1: Create the initial Lance table
 
 Start clean, then build the Lance table locally.
 This creates the `characters` table, computes embeddings in batches, and creates an FTS index.
@@ -28,7 +29,7 @@ rm -rf magical_kingdom
 uv run python create_dataset.py
 ```
 
-## Stage 2: Upload the Initial Snapshot to the Hub
+## Step 2: Upload the Initial Snapshot to the Hub
 
 Upload the full `magical_kingdom` directory to `datasets/lancedb/magical_kingdom`.
 
@@ -38,18 +39,21 @@ hf upload lancedb/magical_kingdom magical_kingdom . \
   --commit-message "Initial table (no category)"
 ```
 
-## Stage 3: Apply the Update Locally
+## Step 3: Update the dataset locally
 
-Run the update script once.
-It adds the `category` column and backfills values with a single `merge_insert` operation.
+Imagine a scenario where you want to add a new `category` column and backfill its values with a single `merge_insert` operation into your existing table.
+
+This is **both as schema update and a data update**, which Lance excels at: because Lance supports incremental data evolution, it can add, remove and alter columns _without rewriting any data files_ in the existing dataset, making them very efficient operations on large tables.
 
 ```bash
 uv run python update_dataset.py
 ```
 
-## Stage 4: Upload the Updated Snapshot to the Hub
+Over time, you can run a [compaction](https://docs.lancedb.com/lance#data-compaction) job that calls `table.optimize()` to manage the number of manifests that are recorded in the history.
 
-Upload the same local directory again with a new commit message.
+## Step 4: Upload the updated version to the Hub
+
+Upload the same local directory again (now a new version of the dataset) with a new commit message.
 
 ```bash
 hf upload lancedb/magical_kingdom magical_kingdom . \
@@ -57,7 +61,7 @@ hf upload lancedb/magical_kingdom magical_kingdom . \
   --commit-message "Add category column and backfill values"
 ```
 
-## Stage 5: Inspect Versions and Query on the Hub
+## Step 5: Inspect versions and query on the Hub
 
 `inspect_dataset.py` reads from `hf://datasets/lancedb/magical_kingdom` and prints table versions.
 `query.py` also reads from the Hub and runs all five example queries.
