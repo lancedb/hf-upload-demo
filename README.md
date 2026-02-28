@@ -1,7 +1,10 @@
-# LanceDB Create + Update Demo
+# LanceDB Hugging Face Update Demo
 
-This project demonstrates a simple staged workflow for LanceDB with Hugging Face Hub.
-You first create and upload an initial table, then apply a one-time schema + data update, and upload the updated snapshot.
+This project demonstrates a simple staged workflow for to manage your Lance datasets on [Hugging Face Hub](https://huggingface.co/datasets/lancedb/magical_kingdom).
+
+To create a repo like this, first create and upload an initial table using LanceDB on a local machine, and then upload it to the Hub via a CLI command.
+
+As the dataset evolves, you can apply a one-time schema + data update, and upload the updated version of the data back to the Hub. Only the new data is uploaded, keeping things clean.
 
 ## Setup
 
