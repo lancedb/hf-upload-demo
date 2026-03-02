@@ -43,7 +43,7 @@ hf upload lancedb/magical_kingdom magical_kingdom . \
 
 Imagine a scenario where you want to add a new `category` column and backfill its values with a single `merge_insert` operation into your existing table.
 
-This is **both as schema update and a data update**, which Lance excels at: because Lance supports incremental data evolution, it can add, remove and alter columns _without rewriting any data files_ in the existing dataset, making them very efficient operations on large tables.
+This is **both as schema update and a data update**, which Lance excels at: because Lance supports incremental [data evolution](https://lance.org/guide/data_evolution): it can add, remove and alter columns _without rewriting any data files_ in the existing dataset without touching existing data, making it very I/O-efficient when updating large tables.
 
 ```bash
 uv run python update_dataset.py
@@ -64,20 +64,58 @@ hf upload lancedb/magical_kingdom magical_kingdom . \
 ## Step 5: Inspect versions and query on the Hub
 
 `inspect_dataset.py` reads from `hf://datasets/lancedb/magical_kingdom` and prints table versions.
-`query.py` also reads from the Hub and runs all five example queries.
+
 
 ```bash
 uv run python inspect_dataset.py
-uv run python query.py
 ```
 
 If you run `update_dataset.py` again without resetting, it will fail at `add_columns` because `category` already exists.
 That is expected for this one-time demo flow.
 
+`query.py` also reads from the Hub and runs all five example queries.
+
+```bash
+uv run python query.py
+```
+
+Example:
+```python
+import lancedb
+
+# Scan data directly from the Hugging Face Hub
+# (No need to download the dataset locally)
+DB_URI = "hf://datasets/lancedb/magical_kingdom"
+TABLE_NAME = "characters"
+
+(
+    table.search()
+    .where("category = 'knight'")
+    .select(["name", "role", "stats.strength"])
+    .limit(4)
+    .to_polars()
+    .sort("stats.strength", descending=True)
+    .head(1)
+)
+```
+The character belonging to the `knight` category with the greatest strength is Sir Lancelot! 🗡️
+
+```
+┌──────────────┬───────────────────────────┬────────────────┐
+│ name         ┆ role                      ┆ stats.strength │
+│ ---          ┆ ---                       ┆ ---            │
+│ str          ┆ str                       ┆ i8             │
+╞══════════════╪═══════════════════════════╪════════════════╡
+│ Sir Lancelot ┆ Knight of the Round Table ┆ 5              │
+└──────────────┴───────────────────────────┴────────────────┘
+```
+
 ## Update the Dataset Card
 
-The Hub dataset card is the repo’s root `README.md`.
-This project keeps the source card text in `HF_DATASET_CARD.md`, so publish updates there and upload it as `README.md` as required:
+The Hub dataset card allows you to communicate the schema and usage of the dataset to other developers.
+It sits at the repo’s root in a file named `README.md` on the Hub.
+This project keeps the source card text in `HF_DATASET_CARD.md`, so you can publish updates
+to the dataset there and upload it as `README.md` using the following command on the HF CLI:
 
 ```bash
 hf upload lancedb/magical_kingdom HF_DATASET_CARD.md README.md \
@@ -87,9 +125,11 @@ hf upload lancedb/magical_kingdom HF_DATASET_CARD.md README.md \
 
 ## Optional: Reset the Hub Repo
 
-If you want to replay the full demo from scratch on the Hub:
+If you want to reproduce the full demo from scratch on the Hub, delete the existing repo and recreate it:
 
 ```bash
 hf repos delete lancedb/magical_kingdom --repo-type dataset
 hf repos create lancedb/magical_kingdom --repo-type dataset
 ```
+
+Then, work through the steps describe above. Have fun uploading your Lance datasets on Hugging Face!
