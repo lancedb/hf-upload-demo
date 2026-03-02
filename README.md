@@ -70,8 +70,9 @@ hf upload lancedb/magical_kingdom magical_kingdom . \
 uv run python inspect_dataset.py
 ```
 
-If you run `update_dataset.py` again without resetting, it will fail at `add_columns` because `category` already exists.
-That is expected for this one-time demo flow.
+If you run `update_dataset.py` again without resetting, it will fail at `add_columns`
+because the `category` column already exists. If you want to upsert the column's data,
+comment out the line that adds the `category` column.
 
 `query.py` also reads from the Hub and runs all five example queries.
 
