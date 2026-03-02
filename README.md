@@ -85,18 +85,17 @@ import lancedb
 
 # Scan data directly from the Hugging Face Hub
 # (No need to download the dataset locally)
-DB_URI = "hf://datasets/lancedb/magical_kingdom"
-TABLE_NAME = "characters"
+db = lancedb.connect("hf://datasets/lancedb/magical_kingdom")
+table = db.open_table("characters")
 
-(
-    table.search()
-    .where("category = 'knight'")
-    .select(["name", "role", "stats.strength"])
-    .limit(4)
-    .to_polars()
-    .sort("stats.strength", descending=True)
+r = table.search() \
+    .where("category = 'knight'") \
+    .select(["name", "role", "stats.strength"]) \
+    .limit(4) \
+    .to_polars() \
+    .sort("stats.strength", descending=True) \
     .head(1)
-)
+print(r)
 ```
 The character belonging to the `knight` category with the greatest strength is Sir Lancelot! 🗡️
 
