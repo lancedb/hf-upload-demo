@@ -22,8 +22,10 @@ from PIL import Image
 load_dotenv()
 assert os.environ.get("OPENAI_API_KEY"), "OPENAI_API_KEY must be set in environment"
 
-INPUT_JSON = Path("magical_kingdom.json")
-IMAGE_DIR = Path("img")
+BASE_DIR = Path(__file__).resolve().parent
+RAW_DATA_DIR = BASE_DIR / "raw_data"
+INPUT_JSON = RAW_DATA_DIR / "magical_kingdom.json"
+IMAGE_DIR = RAW_DATA_DIR / "img"
 DB_DIR = Path("magical_kingdom")
 TABLE_NAME = "characters"
 BATCH_SIZE = 5
@@ -107,7 +109,7 @@ def iter_row_batches(batch_size: int = BATCH_SIZE) -> Iterator[pa.RecordBatch]:
                     "magic": stats["magic"],
                     "wisdom": stats["wisdom"],
                 },
-                "image_path": f"img/{img_path.name}",
+                "image_path": f"raw_data/img/{img_path.name}",
                 "image": img_path.read_bytes(),
                 "text_for_embedding": f"{row['role']}. {row['description']}",
             }
