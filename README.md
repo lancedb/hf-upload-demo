@@ -1,6 +1,6 @@
 # LanceDB Hugging Face Update Demo
 
-This project demonstrates a simple staged workflow for to manage your Lance datasets on [Hugging Face Hub](https://huggingface.co/datasets/lancedb/magical_kingdom).
+This project demonstrates a simple staged workflow to manage your Lance datasets on [Hugging Face Hub](https://huggingface.co/datasets/lancedb/magical_kingdom).
 
 To create a repo like this, first create and upload an initial table using LanceDB on a local machine, and then upload it to the Hub via a CLI command.
 
@@ -18,6 +18,24 @@ hf auth login --token "$HF_TOKEN"
 ```
 
 The scripts look for a local file named `.env`, so to run any of them, you'll need to copy the `.env.example` to a new file named `.env` and update the respective env variables there.
+
+## Raw data layout
+
+Source JSON and generated portraits live under `raw_data/`:
+
+- `raw_data/magical_kingdom.json`
+- `raw_data/img/`
+- `raw_data/generate_images.py`
+
+See `raw_data/README.md` for details on regenerating those assets.
+
+## Optional: Regenerate character portraits
+
+If you want to regenerate the source images using an OpenAI model, run:
+
+```bash
+uv run python raw_data/generate_images.py
+```
 
 ## Step 1: Create the initial Lance table
 
@@ -132,4 +150,4 @@ hf repos delete lancedb/magical_kingdom --repo-type dataset
 hf repos create lancedb/magical_kingdom --repo-type dataset
 ```
 
-Then, work through the steps describe above. Have fun uploading your Lance datasets on Hugging Face!
+Then, work through the steps described above. Have fun uploading your Lance datasets on Hugging Face!

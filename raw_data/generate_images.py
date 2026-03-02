@@ -1,4 +1,4 @@
-"""Generate 1024x1024 character portraits into ./img from magical_kingdom.json."""
+"""Generate 1024x1024 character portraits into raw_data/img from raw_data/magical_kingdom.json."""
 
 import base64
 import json
