@@ -52,10 +52,12 @@ uv run python create_dataset.py
 Upload the full `magical_kingdom` directory to `datasets/lancedb/magical_kingdom`.
 
 ```bash
-hf upload lancedb/magical_kingdom magical_kingdom . \
+hf upload-large-folder magical_kingdom magical_kingdom \
   --repo-type dataset \
-  --commit-message "Initial table (no category)"
+  --revision main
 ```
+
+`hf upload-large-folder` uses a resumable multi-commit flow, which is more flexible and error-tolerant than `hf upload`, but it does not support custom commit messages.
 
 ## Step 3: Update the dataset locally
 
@@ -71,12 +73,12 @@ Over time, you can run a [compaction](https://docs.lancedb.com/lance#data-compac
 
 ## Step 4: Upload the updated version to the Hub
 
-Upload the same local directory again (now a new version of the dataset) with a new commit message.
+Upload the same local directory again (now a new version of the dataset).
 
 ```bash
-hf upload lancedb/magical_kingdom magical_kingdom . \
+hf upload-large-folder lancedb/magical_kingdom magical_kingdom \
   --repo-type dataset \
-  --commit-message "Add category column and backfill values"
+  --revision main
 ```
 
 ## Step 5: Inspect versions and query on the Hub
@@ -134,6 +136,7 @@ The Hub dataset card allows you to communicate the schema and usage of the datas
 It sits at the repo’s root in a file named `README.md` on the Hub.
 This project keeps the source card text in `HF_DATASET_CARD.md`, so you can publish updates
 to the dataset there and upload it as `README.md` using the following command on the HF CLI:
+this requires a regular `hf upload` because it is a single-file upload to a specific target path -- and a custom commit message can be added.
 
 ```bash
 hf upload lancedb/magical_kingdom HF_DATASET_CARD.md README.md \

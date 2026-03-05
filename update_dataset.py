@@ -31,7 +31,6 @@ def main() -> None:
 
     # Step 1: add the new column (schema evolution).
     table.add_columns(pa.field("category", pa.string()))
-    table = db.open_table(TABLE_NAME)
 
     # Step 2: compute categories in Python and prepare merge input.
     n = table.count_rows()
